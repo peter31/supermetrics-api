@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+$app = new \App\Application();
+
+$apiManager = new \App\Supermetrics\ApiManager();
+for ($i = 1; $i <= 10; $i++) {
+    foreach ($apiManager->getPosts($i) as $post) {
+        var_dump($post);die;
+
+        // id
+        // Total length
+        // date
+        // user
+    }
+}
