@@ -3,7 +3,7 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="App\Entity\PostStatistics" table="posts_statistics">
+    <entity name="App\Entity\PostStatistics" table="posts_statistics" repository-class="App\Repository\PostStatisticsRepository">
         <id name="id" type="integer">
             <generator strategy="AUTO"/>
         </id>

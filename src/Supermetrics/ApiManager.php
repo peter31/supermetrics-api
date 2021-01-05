@@ -12,10 +12,23 @@ class ApiManager
     /** @var Client */
     private $client;
 
-    public function __construct()
+    /** @var string */
+    private $clientId;
+
+    /** @var string */
+    private $email;
+
+    /** @var string */
+    private $name;
+
+    public function __construct(string $baseUrl, string $clientId, string $email, string $name)
     {
+        $this->clientId = $clientId;
+        $this->email = $email;
+        $this->name = $name;
+
         $this->client = new Client([
-            'base_uri' => 'https://api.supermetrics.com'
+            'base_uri' => $baseUrl
         ]);
     }
 
@@ -31,9 +44,9 @@ class ApiManager
                 '/assignment/register',
                 [
                     'form_params' => [
-                        'client_id' => 'ju16a6m81mhid5ue1z3v2g0uh',
-                        'email' => 'your@email.address',
-                        'name' => 'Your Name',
+                        'client_id' => $this->clientId,
+                        'email' => $this->email,
+                        'name' => $this->name,
                     ]
                 ]
             )

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Controller\StatisticsController;
+use App\Supermetrics\ApiManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 
@@ -27,10 +29,10 @@ class Application
         if (null === $this->em) {
             $dbParams = [
                 'driver'   => 'pdo_mysql',
-                'host'     => 'mysql',
-                'user'     => 'root',
-                'password' => 'root',
-                'dbname'   => 'sm',
+                'host'     => $_ENV['DB_HOST'] ?? '',
+                'user'     => $_ENV['DB_USER'] ?? '',
+                'password' => $_ENV['DB_PASSWORD'] ?? '',
+                'dbname'   => $_ENV['DB_NAME'] ?? '',
             ];
 
             $config = Setup::createXMLMetadataConfiguration([dirname(__DIR__) . '/config/doctrine/'], false);
@@ -40,5 +42,28 @@ class Application
         }
 
         return $this->em;
+    }
+
+    public function getSupermetricsApiManager()
+    {
+        return new ApiManager(
+            $_ENV['SM_API_BASE_URL'] ?? '',
+            $_ENV['SM_API_CLIENT_ID'] ?? '',
+            $_ENV['SM_API_EMAIL'] ?? '',
+            $_ENV['SM_API_NAME'] ?? ''
+        );
+    }
+
+    public function getControllerByRequest(): ?array
+    {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = parse_url($requestUri, PHP_URL_PATH);
+        $path = rtrim($path, '/');
+
+        $routingConfig = [
+            '' => [StatisticsController::class, 'index']
+        ];
+
+        return array_key_exists($path, $routingConfig) ? $routingConfig[$path] : null;
     }
 }
