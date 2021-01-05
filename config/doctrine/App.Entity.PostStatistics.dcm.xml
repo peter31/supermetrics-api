@@ -1,0 +1,17 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Entity\PostStatistics" table="posts_statistics">
+        <id name="id" type="integer">
+            <generator strategy="AUTO"/>
+        </id>
+        <field name="originalId" column="original_id"/>
+        <field name="messageLength" type="integer" column="message_length"/>
+        <field name="fromName" column="from_name"/>
+        <field name="fromId" column="from_id"/>
+        <field name="createdTime" type="datetime" column="created_time"/>
+    </entity>
+
+</doctrine-mapping>

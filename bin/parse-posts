@@ -3,16 +3,38 @@
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$app = new \App\Application();
+$app = new \App\Application(true);
+
+$em = $app->getEntityManager();
+$postsRepository = $em->getRepository(\App\Entity\PostStatistics::class);
 
 $apiManager = new \App\Supermetrics\ApiManager();
 for ($i = 1; $i <= 10; $i++) {
-    foreach ($apiManager->getPosts($i) as $post) {
-        var_dump($post);die;
+    $posts = $apiManager->getPosts($i);
+    $originalIds = array_map(function (\App\Supermetrics\Model\PostModel $post) {return $post->getId();}, $posts);
 
-        // id
-        // Total length
-        // date
-        // user
+    $existingPostsStatistics = [];
+    foreach ($postsRepository->findBy(['originalId' => $originalIds]) as $exitingPostStatistics) {
+        $existingPostsStatistics[$exitingPostStatistics->getOriginalId()] = $exitingPostStatistics;
     }
+
+    foreach ($posts as $post) {
+        if (array_key_exists($post->getId(), $existingPostsStatistics)) {
+            $postStatistics = $existingPostsStatistics[$post->getId()];
+        } else {
+            $postStatistics = new \App\Entity\PostStatistics();
+            $postStatistics->setOriginalId($post->getId());
+            $postStatistics->setFromName($post->getFromName());
+            $postStatistics->setFromId($post->getFromId());
+            $postStatistics->setCreatedTime($post->getCreatedTime());
+
+            echo sprintf('[%s] New post statistics created', $postStatistics->getOriginalId()) . PHP_EOL;
+        }
+
+        $postStatistics->setMessageLength(mb_strlen($post->getMessage()));
+        $em->persist($postStatistics);
+    }
+
+    $em->flush();
+    $em->clear();
 }

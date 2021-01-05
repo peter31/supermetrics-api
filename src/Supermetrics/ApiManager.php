@@ -48,7 +48,7 @@ class ApiManager
 
     /**
      * @param int $page
-     * @return array
+     * @return PostModel[]
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \RuntimeException
      */
