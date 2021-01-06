@@ -18,9 +18,10 @@ Start the containers
 docker-compose up -d
 ```
 
-Connect to project PHP container and run parse posts command
+Connect to project PHP container, import MySQL schema and run parse posts command
 ```
 docker exec -it sm_api_php bash
+mysql -hmysql -usm -psm sm < docker/mysql/main.sql
 bin/parse-posts
 ```
 
