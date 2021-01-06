@@ -2,31 +2,30 @@
 
 ### Project installation
 
-Supported OS are Linux and MacOS.
+1- Set up local docker and docker-compose tools.
 
-Set up local docker and docker-compose tools.
-
-Go to the project root folder and create `.env` file:
+2- Go to the project root folder and create `.env` file:
 ```bash
 cp .env.dist .env
 ```
-
 The default configuration will work from the box.
 
-Start the containers
+3- Start the containers
 ```bash
 docker-compose up -d
 ```
 
-Connect to project PHP container, import MySQL schema and run parse posts command
+4- Connect to project PHP container, install packages, import MySQL schema and run parse posts command
 ```
 docker exec -it sm_api_php bash
+composer install
 mysql -hmysql -usm -psm sm < docker/mysql/main.sql
 bin/parse-posts
 ```
 
-Once all posts are parsed open and check posts statistics on main page in browser:
-[http://localhost:8003/](http://localhost:8003/)
+5- Once all posts are parsed open and check posts statistics on main page in browser: [http://localhost:8003/](http://localhost:8003/)
+
+JSON is pretty printed and can be viewed conveniently in page source. 
 
 
 ### Used libraries explanation

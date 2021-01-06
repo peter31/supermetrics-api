@@ -26,6 +26,6 @@ class StatisticsController
             'longest_post_per_month' => $repository->getLongestPostPerMonth(),
             'total_posts_per_week' => $repository->getTotalPostsPerWeek(),
             'average_posts_per_user_per_month' => $repository->getAveragePostsPerUserPerMonth(),
-        ]);
+        ], JSON_PRETTY_PRINT);
     }
 }
