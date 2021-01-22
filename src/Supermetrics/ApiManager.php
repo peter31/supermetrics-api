@@ -4,12 +4,13 @@ namespace App\Supermetrics;
 
 use App\Supermetrics\Model\ApiResponseModel;
 use App\Supermetrics\Model\PostModel;
-use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class ApiManager
 {
-    /** @var Client */
+    /** @var ClientInterface */
     private $client;
 
     /** @var string */
@@ -21,15 +22,28 @@ class ApiManager
     /** @var string */
     private $name;
 
-    public function __construct(string $baseUrl, string $clientId, string $email, string $name)
+    public function setClient(ClientInterface $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    public function setClientId(string $clientId): self
     {
         $this->clientId = $clientId;
-        $this->email = $email;
-        $this->name = $name;
+        return $this;
+    }
 
-        $this->client = new Client([
-            'base_uri' => $baseUrl
-        ]);
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**
@@ -39,16 +53,19 @@ class ApiManager
      */
     public function getSlToken(): string
     {
-        $responseModel = $this->prepareResponseModel(
-            $this->client->post(
-                '/assignment/register',
-                [
-                    'form_params' => [
-                        'client_id' => $this->clientId,
-                        'email' => $this->email,
-                        'name' => $this->name,
+        $responseModel = $this->parseAndValidateResponse(
+            $this->client->sendRequest(
+                new Request(
+                    'POST',
+                    '/assignment/register',
+                    [
+                        'form_params' => [
+                            'client_id' => $this->clientId,
+                            'email' => $this->email,
+                            'name' => $this->name,
+                        ]
                     ]
-                ]
+                )
             )
         );
 
@@ -65,17 +82,20 @@ class ApiManager
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \RuntimeException
      */
-    public function getPosts(int $page = 1): array
+    public function getPosts(string $slToken, int $page = 1): array
     {
-        $responseModel = $this->prepareResponseModel(
-            $this->client->get(
-            '/assignment/posts',
-                [
-                    'query' => [
-                        'sl_token' => $this->getSlToken(),
-                        'page' => $page
+        $responseModel = $this->parseAndValidateResponse(
+            $this->client->sendRequest(
+                new Request(
+                    'GET',
+                    '/assignment/posts',
+                    [
+                        'query' => [
+                            'sl_token' => $slToken,
+                            'page' => $page
+                        ]
                     ]
-                ]
+                )
             )
         );
 
@@ -91,7 +111,7 @@ class ApiManager
         );
     }
 
-    private function prepareResponseModel(ResponseInterface $response): ApiResponseModel
+    private function parseAndValidateResponse(ResponseInterface $response): ApiResponseModel
     {
         if ($response->getStatusCode() !== 200) {
             throw new \RuntimeException(sprintf('[Supermetrics API] Incorrect response status "%s"', $response->getStatusCode()));

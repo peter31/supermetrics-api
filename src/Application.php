@@ -6,6 +6,7 @@ use App\Controller\StatisticsController;
 use App\Supermetrics\ApiManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
+use GuzzleHttp\Client;
 
 class Application
 {
@@ -46,12 +47,14 @@ class Application
 
     public function getSupermetricsApiManager()
     {
-        return new ApiManager(
-            $_ENV['SM_API_BASE_URL'] ?? '',
-            $_ENV['SM_API_CLIENT_ID'] ?? '',
-            $_ENV['SM_API_EMAIL'] ?? '',
-            $_ENV['SM_API_NAME'] ?? ''
-        );
+        $client = new Client(['base_uri' => $_ENV['SM_API_BASE_URL'] ?? '']);
+
+        return (new ApiManager())
+            ->setClient($client)
+            ->setClientId($_ENV['SM_API_CLIENT_ID'])
+            ->setEmail($_ENV['SM_API_EMAIL'])
+            ->setName($_ENV['SM_API_NAME'])
+        ;
     }
 
     public function getControllerByRequest(): ?array

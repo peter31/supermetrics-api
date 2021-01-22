@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use App\Command\SyncPostsCommandHandler;
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $dotenv = new \Symfony\Component\Dotenv\Dotenv();
@@ -8,6 +10,11 @@ $dotenv->load(dirname(__DIR__).'/.env');
 
 $app = new \App\Application(true);
 
-$command = new \App\Command\ParsePostsCommand($app->getEntityManager(), $app->getSupermetricsApiManager());
+$commandHandler = new SyncPostsCommandHandler(
+    $app->getEntityManager(),
+    new \App\Repository\PostRepository($app->getSupermetricsApiManager())
+);
+
+$command = new \App\ConsoleCommand\ParsePostsCommand($commandHandler);
 $command->execute();
 
